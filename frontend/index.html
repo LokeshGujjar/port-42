@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port42 - Cyberpunk Learning Hub</title>
+    
+    <!-- Cyberpunk Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/components.css">
+    <link rel="stylesheet" href="src/styles/animations.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <canvas id="matrix-bg" class="matrix-background"></canvas>
+    
+    <!-- Main App Container -->
+    <div id="app" class="app-container">
+        <!-- Navigation Header -->
+        <header class="nav-header">
+            <div class="nav-container">
+                <!-- Logo -->
+                <div class="logo">
+                    <span class="logo-icon">🌐</span>
+                    <span class="logo-text">PORT42</span>
+                    <span class="logo-subtitle">// NEURAL_NET_ACCESS</span>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="nav-menu">
+                    <a href="#" class="nav-link active" data-page="home">
+                        <span class="nav-icon">🏠</span>
+                        <span>HOME</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="communities">
+                        <span class="nav-icon">🏛️</span>
+                        <span>COMMUNITIES</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="submit">
+                        <span class="nav-icon">📡</span>
+                        <span>SUBMIT</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="profile">
+                        <span class="nav-icon">👤</span>
+                        <span>PROFILE</span>
+                    </a>
+                </nav>
+                
+                <!-- User Actions -->
+                <div class="nav-actions">
+                    <div id="user-menu" class="user-menu hidden">
+                        <span class="username">USER_NAME</span>
+                        <div class="user-stats">
+                            <span class="reputation">REP: <span id="user-rep">0</span></span>
+                            <span class="level">LVL: <span id="user-level">NEWBIE</span></span>
+                        </div>
+                        <button id="logout-btn" class="btn btn-danger">LOGOUT</button>
+                    </div>
+                    
+                    <div id="auth-buttons" class="auth-buttons">
+                        <button id="login-btn" class="btn btn-primary">LOGIN</button>
+                        <button id="register-btn" class="btn btn-secondary">REGISTER</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Loading Screen -->
+            <div id="loading-screen" class="loading-screen">
+                <div class="loading-content">
+                    <div class="loading-logo">🌐</div>
+                    <div class="loading-text">INITIALIZING PORT42...</div>
+                    <div class="loading-bar">
+                        <div class="loading-progress"></div>
+                    </div>
+                    <div class="loading-status">CONNECTING TO THE MATRIX</div>
+                </div>
+            </div>
+
+            <!-- Home Page -->
+            <div id="home-page" class="page hidden">
+                <!-- Terminal Welcome -->
+                <div class="terminal-welcome">
+                    <div class="terminal-header">
+                        <span class="terminal-title">WELCOME TO PORT42 NEURAL NETWORK</span>
+                        <span class="terminal-status">STATUS: ONLINE</span>
+                    </div>
+                    <div class="terminal-content">
+                        <p>// ACCESSING COLLECTIVE INTELLIGENCE DATABASE</p>
+                        <p>// CYBERPUNK LEARNING RESOURCES AVAILABLE</p>
+                        <p>// SHARE_KNOWLEDGE() | VOTE() | DISCUSS()</p>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <label>COMMUNITY:</label>
+                        <select id="community-filter" class="cyber-select">
+                            <option value="">ALL_NETWORKS</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>TYPE:</label>
+                        <select id="type-filter" class="cyber-select">
+                            <option value="">ALL_TYPES</option>
+                            <option value="article">ARTICLES</option>
+                            <option value="video">VIDEOS</option>
+                            <option value="course">COURSES</option>
+                            <option value="tool">TOOLS</option>
+                            <option value="tutorial">TUTORIALS</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>SORT:</label>
+                        <select id="sort-filter" class="cyber-select">
+                            <option value="newest">NEWEST</option>
+                            <option value="popular">POPULAR</option>
+                            <option value="discussed">MOST_DISCUSSED</option>
+                        </select>
+                    </div>
+                    
+                    <div class="search-group">
+                        <input type="text" id="search-input" class="cyber-input" placeholder="SEARCH THE MATRIX...">
+                        <button id="search-btn" class="btn btn-primary">SCAN</button>
+                    </div>
+                </div>
+
+                <!-- Resources Grid -->
+                <div id="resources-container" class="resources-container">
+                    <!-- Resources will be dynamically loaded here -->
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="pagination">
+                    <!-- Pagination controls will be added here -->
+                </div>
+            </div>
+
+            <!-- Communities Page -->
+            <div id="communities-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">NEURAL NETWORKS</h1>
+                    <p class="page-subtitle">// ACCESS SPECIALIZED KNOWLEDGE CLUSTERS</p>
+                </div>
+                
+                <div id="communities-grid" class="communities-grid">
+                    <!-- Communities will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Submit Page -->
+            <div id="submit-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">TRANSMIT KNOWLEDGE</h1>
+                    <p class="page-subtitle">// UPLOAD NEW RESOURCE TO THE COLLECTIVE</p>
+                </div>
+                
+                <form id="submit-form" class="submit-form">
+                    <div class="form-group">
+                        <label for="resource-title">RESOURCE TITLE:</label>
+                        <input type="text" id="resource-title" class="cyber-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-url">URL:</label>
+                        <input type="url" id="resource-url" class="cyber-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-description">DESCRIPTION:</label>
+                        <textarea id="resource-description" class="cyber-textarea" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="resource-community">COMMUNITY:</label>
+                            <select id="resource-community" class="cyber-select" required>
+                                <option value="">SELECT NETWORK...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="resource-type">TYPE:</label>
+                            <select id="resource-type" class="cyber-select">
+                                <option value="article">ARTICLE</option>
+                                <option value="video">VIDEO</option>
+                                <option value="course">COURSE</option>
+                                <option value="tool">TOOL</option>
+                                <option value="tutorial">TUTORIAL</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="resource-difficulty">DIFFICULTY:</label>
+                            <select id="resource-difficulty" class="cyber-select">
+                                <option value="beginner">NOVICE</option>
+                                <option value="intermediate">ADEPT</option>
+                                <option value="advanced">EXPERT</option>
+                                <option value="expert">MASTER</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="resource-tags">TAGS (comma separated):</label>
+                        <input type="text" id="resource-tags" class="cyber-input" placeholder="javascript, tutorial, beginners">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large">TRANSMIT TO NETWORK</button>
+                </form>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page hidden">
+                <div class="page-header">
+                    <h1 class="page-title">USER PROFILE</h1>
+                    <p class="page-subtitle">// ACCESS YOUR NEURAL INTERFACE</p>
+                </div>
+                
+                <div id="profile-content" class="profile-content">
+                    <!-- Profile content will be loaded here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <!-- Auth Modal -->
+            <div id="auth-modal" class="modal">
+                <div class="modal-header">
+                    <h2 id="auth-modal-title">SYSTEM ACCESS</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-content">
+                    <form id="auth-form">
+                        <div id="auth-fields">
+                            <!-- Dynamic auth fields -->
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large" id="auth-submit">AUTHENTICATE</button>
+                    </form>
+                    <div class="auth-switch">
+                        <span id="auth-switch-text">Need access?</span>
+                        <button id="auth-switch-btn" class="link-btn">Register</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource Detail Modal -->
+            <div id="resource-modal" class="modal modal-large">
+                <div class="modal-header">
+                    <h2 id="resource-modal-title">RESOURCE DETAILS</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-content" id="resource-modal-content">
+                    <!-- Resource details and comments -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="src/utils/api.js"></script>
+    <script src="src/utils/auth.js"></script>
+    <script src="src/utils/socket.js"></script>
+    <script src="src/components/Resource.js"></script>
+    <script src="src/components/Community.js"></script>
+    <script src="src/components/Comments.js"></script>
+    <script src="src/pages/Home.js"></script>
+    <script src="src/pages/Communities.js"></script>
+    <script src="src/pages/Submit.js"></script>
+    <script src="src/pages/Profile.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>

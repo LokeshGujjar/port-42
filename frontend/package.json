@@ -1,0 +1,18 @@
+{
+  "name": "port42-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Port42 cyberpunk learning platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --host=localhost",
+    "dev": "live-server --port=3000 --host=localhost --watch=src",
+    "build": "echo 'No build process needed for vanilla JS'",
+    "test": "echo 'No tests specified'"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "keywords": ["frontend", "vanilla-js", "cyberpunk", "learning"],
+  "author": "Port42 Developer",
+  "license": "MIT"
+}
