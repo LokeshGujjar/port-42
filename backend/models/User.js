@@ -170,11 +170,14 @@ userSchema.virtual('upvoteRatio').get(function() {
   return Math.round((this.totalUpvotes / total) * 100);
 });
 
-// 📝 Index for faster queries
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
-userSchema.index({ reputation: -1 });
-userSchema.index({ createdAt: -1 });
+// 📝 Indexes for faster queries
+userSchema.index({ username: 1 }, { unique: true }); // Username lookup
+userSchema.index({ email: 1 }, { unique: true }); // Email lookup
+userSchema.index({ reputation: -1 }); // Leaderboard
+userSchema.index({ createdAt: -1 }); // Recent users
+userSchema.index({ isActive: 1, reputation: -1 }); // Active users by reputation
+userSchema.index({ followedCommunities: 1 }); // Community membership
+userSchema.index({ 'preferences.theme': 1 }); // Theme statistics
 
 // Export the model
 module.exports = mongoose.model('User', userSchema);

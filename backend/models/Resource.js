@@ -226,21 +226,29 @@ resourceSchema.methods.removeVote = function(userId) {
 };
 
 // 🔍 Indexes for better query performance
-resourceSchema.index({ community: 1, createdAt: -1 });
-resourceSchema.index({ submittedBy: 1 });
-resourceSchema.index({ url: 1 }, { unique: true });
-resourceSchema.index({ upvotes: -1 });
-resourceSchema.index({ createdAt: -1 });
-resourceSchema.index({ tags: 1 });
-resourceSchema.index({ type: 1 });
-resourceSchema.index({ difficulty: 1 });
-resourceSchema.index({ isActive: 1, isFeatured: -1 });
+resourceSchema.index({ community: 1, createdAt: -1 }); // Community timeline
+resourceSchema.index({ submittedBy: 1, createdAt: -1 }); // User resources
+resourceSchema.index({ url: 1 }, { unique: true }); // Prevent duplicates
+resourceSchema.index({ upvotes: -1, createdAt: -1 }); // Popular sorting
+resourceSchema.index({ createdAt: -1 }); // Recent sorting
+resourceSchema.index({ tags: 1 }); // Tag filtering
+resourceSchema.index({ type: 1, difficulty: 1 }); // Category filtering
+resourceSchema.index({ isActive: 1, isFeatured: -1 }); // Active/featured
+resourceSchema.index({ 'voters.user': 1 }); // Vote lookups
+resourceSchema.index({ lastInteraction: -1 }); // Trending calculation
 
 // 📝 Text search index
 resourceSchema.index({
   title: 'text',
   description: 'text',
   tags: 'text'
+}, {
+  weights: {
+    title: 10,
+    description: 5,
+    tags: 3
+  },
+  name: 'resource_text_index'
 });
 
 module.exports = mongoose.model('Resource', resourceSchema);

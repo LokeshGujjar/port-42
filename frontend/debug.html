@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port42 Debug - System Status</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff41; 
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+        h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #00ff41;
+            text-align: center;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .status-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .status-card:hover {
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        .status-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #00ffff;
+        }
+        .status-value {
+            font-size: 1rem;
+            padding: 0.5rem;
+            background: #0a0a0a;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+        .status-ok { color: #00ff41; }
+        .status-error { color: #ff0040; }
+        .status-warning { color: #ffaa00; }
+        .log-section {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+        }
+        .btn {
+            background: #00ff41;
+            color: #0a0a0a;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #00cc33;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        .btn-secondary {
+            background: #333;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+        }
+        .btn-secondary:hover {
+            background: #00ff41;
+            color: #0a0a0a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 PORT42 SYSTEM STATUS</h1>
+        
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-title">Frontend Server</div>
+                <div class="status-value" id="frontend-status">Checking...</div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-title">Backend API</div>
+                <div class="status-value" id="backend-status">Checking...</div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-title">Database Connection</div>
+                <div class="status-value" id="database-status">Checking...</div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-title">Resource API</div>
+                <div class="status-value" id="resources-status">Checking...</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0;">
+            <button class="btn" onclick="runAllTests()">🔄 Run All Tests</button>
+            <button class="btn btn-secondary" onclick="goToMainApp()">🚀 Open Main App</button>
+            <button class="btn btn-secondary" onclick="clearLogs()">🧹 Clear Logs</button>
+        </div>
+
+        <div class="log-section">
+            <h3 style="color: #00ffff; margin-bottom: 1rem;">System Logs</h3>
+            <div id="log-output"></div>
+        </div>
+    </div>
+
+    <script>
+        let logs = [];
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push({ message: logEntry, type });
+            
+            const logOutput = document.getElementById('log-output');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log-entry status-${type}`;
+            logDiv.textContent = logEntry;
+            logOutput.appendChild(logDiv);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        function updateStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-value status-${type}`;
+        }
+
+        async function testFrontend() {
+            addLog('Testing frontend server...', 'info');
+            try {
+                // Frontend is working if we can load this page
+                updateStatus('frontend-status', '✅ Online (Port 3000)', 'ok');
+                addLog('Frontend server: OK', 'ok');
+                return true;
+            } catch (error) {
+                updateStatus('frontend-status', '❌ Offline', 'error');
+                addLog(`Frontend error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testBackend() {
+            addLog('Testing backend API connection...', 'info');
+            try {
+                const response = await fetch('http://localhost:3001', {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('backend-status', '✅ Online (Port 3001)', 'ok');
+                    addLog(`Backend API: OK - ${data.message || 'Connected'}`, 'ok');
+                    return true;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('backend-status', '❌ Offline', 'error');
+                addLog(`Backend error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testDatabase() {
+            addLog('Testing database connection via API...', 'info');
+            try {
+                const response = await fetch('http://localhost:3001/api/resources');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus('database-status', '✅ Connected', 'ok');
+                    addLog('Database: Connected via API', 'ok');
+                    return true;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('database-status', '❌ Connection Failed', 'error');
+                addLog(`Database error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testResources() {
+            addLog('Testing resources API endpoint...', 'info');
+            try {
+                const response = await fetch('http://localhost:3001/api/resources');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const resourceCount = data.resources ? data.resources.length : 0;
+                    updateStatus('resources-status', `✅ Working (${resourceCount} resources)`, 'ok');
+                    addLog(`Resources API: OK - Found ${resourceCount} resources`, 'ok');
+                    return true;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('resources-status', '❌ API Error', 'error');
+                addLog(`Resources API error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            addLog('=== Starting system diagnostic ===', 'info');
+            
+            const results = await Promise.allSettled([
+                testFrontend(),
+                testBackend(),
+                testDatabase(),
+                testResources()
+            ]);
+
+            const passed = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+            const total = results.length;
+
+            addLog(`=== Diagnostic complete: ${passed}/${total} tests passed ===`, passed === total ? 'ok' : 'warning');
+        }
+
+        function goToMainApp() {
+            addLog('Redirecting to main application...', 'info');
+            window.location.href = '/';
+        }
+
+        function clearLogs() {
+            logs = [];
+            document.getElementById('log-output').innerHTML = '';
+            addLog('Logs cleared', 'info');
+        }
+
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('Port42 diagnostic tool loaded', 'info');
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

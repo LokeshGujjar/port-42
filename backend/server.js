@@ -6,9 +6,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const mongoSanitize = require('express-mongo-sanitize');
 const http = require('http');
 const socketIo = require('socket.io');
-require('dotenv').config();
+
+// Import configuration and utilities
+const config = require('./config');
+const logger = require('./utils/logger');
+const { sanitizeInput } = require('./middleware/validation');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -23,28 +29,39 @@ const server = http.createServer(app);
 // Initialize Socket.io for real-time features
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: config.server.frontendUrl,
     methods: ["GET", "POST"]
   }
 });
 
+// Create logs directory
+const fs = require('fs');
+if (!fs.existsSync('logs')) {
+  fs.mkdirSync('logs');
+}
+
 // 🛡️ Security Middleware
-app.use(helmet());
+app.use(helmet(config.security.helmetOptions));
+
+// Compression middleware
+app.use(compression());
+
+// Sanitize NoSQL injection
+app.use(mongoSanitize());
 
 // Rate limiting - prevents spam and attacks
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  ...config.rateLimit,
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: '15 minutes'
+    retryAfter: `${config.rateLimit.windowMs / 60000} minutes`
   }
 });
 app.use(limiter);
 
 // 🌐 CORS - allows frontend to communicate with backend
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: config.server.frontendUrl,
   credentials: true
 }));
 
@@ -52,17 +69,34 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Input sanitization
+app.use(sanitizeInput);
+
+// Request logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    logger.logRequest(req, res, duration);
+  });
+  
+  next();
+});
+
 // 🗄️ Database Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/port42', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(config.database.uri, config.database.options)
 .then(() => {
-  console.log('🔗 Connected to MongoDB');
-  console.log('🌐 Database: Port42');
+  logger.info('Database connected', {
+    uri: config.database.uri.replace(/\/\/.*@/, '//***:***@'), // Hide credentials
+    database: config.database.name
+  });
 })
 .catch((err) => {
-  console.error('❌ MongoDB connection error:', err);
+  logger.error('MongoDB connection error', { 
+    error: err.message,
+    stack: err.stack 
+  });
   process.exit(1);
 });
 
@@ -84,23 +118,60 @@ app.get('/', (req, res) => {
 
 // 💬 Socket.io for real-time comments
 io.on('connection', (socket) => {
-  console.log('👤 User connected:', socket.id);
+  logger.info('User connected', { socketId: socket.id, ip: socket.handshake.address });
 
   // Join a resource's comment room
   socket.on('join_resource', (resourceId) => {
     socket.join(`resource_${resourceId}`);
-    console.log(`👤 User ${socket.id} joined resource ${resourceId}`);
+    logger.debug('User joined resource', { 
+      socketId: socket.id, 
+      resourceId 
+    });
   });
 
   // Handle new comments
   socket.on('new_comment', (data) => {
+    logger.debug('New comment received', { 
+      socketId: socket.id, 
+      resourceId: data.resourceId 
+    });
     // Broadcast to all users viewing this resource
     socket.to(`resource_${data.resourceId}`).emit('comment_added', data);
   });
 
+  // Handle voting updates
+  socket.on('vote_update', (data) => {
+    socket.to(`resource_${data.resourceId}`).emit('votes_updated', data);
+  });
+
   // Handle user disconnect
   socket.on('disconnect', () => {
-    console.log('👤 User disconnected:', socket.id);
+    logger.info('User disconnected', { socketId: socket.id });
+  });
+
+  // Handle errors
+  socket.on('error', (error) => {
+    logger.error('Socket error', { 
+      socketId: socket.id, 
+      error: error.message 
+    });
+  });
+});
+
+// 🏥 Health check endpoint
+app.get('/health', (req, res) => {
+  const uptime = process.uptime();
+  const memoryUsage = process.memoryUsage();
+  
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: `${Math.floor(uptime / 60)}m ${Math.floor(uptime % 60)}s`,
+    memory: {
+      used: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
+      total: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`
+    },
+    environment: config.server.nodeEnv
   });
 });
 
@@ -124,15 +195,45 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 🚀 Start Server
-const PORT = process.env.PORT || 5000;
+//  Global error handler
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    body: req.body
+  });
+
+  res.status(500).json({
+    error: 'Internal server error',
+    message: config.server.nodeEnv === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// 🚀 Start the server
+const PORT = config.server.port;
 
 server.listen(PORT, () => {
-  console.log('🚀 Port42 Server Started!');
-  console.log(`🌐 Server running on port ${PORT}`);
-  console.log(`🔗 API: http://localhost:${PORT}`);
-  console.log(`💬 Socket.io: Enabled for real-time features`);
+  logger.info('Server started', {
+    port: PORT,
+    environment: config.server.nodeEnv,
+    frontend: config.server.frontendUrl
+  });
+  console.log('🌐 Port42 Neural Network Online');
+  console.log(`⚡ Server running on port ${PORT}`);
   console.log('⚡ Ready to hack the matrix!');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    mongoose.connection.close(false, () => {
+      logger.info('Process terminated');
+      process.exit(0);
+    });
+  });
 });
 
 // Export for testing purposes

@@ -3,14 +3,29 @@
   "version": "1.0.0",
   "description": "Frontend for Port42 cyberpunk learning platform",
   "main": "index.html",
+  "type": "module",
   "scripts": {
-    "start": "live-server --port=3000 --host=localhost",
-    "dev": "live-server --port=3000 --host=localhost --watch=src",
-    "build": "echo 'No build process needed for vanilla JS'",
-    "test": "echo 'No tests specified'"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint . --ext .js,.html",
+    "lint:fix": "eslint . --ext .js,.html --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
-    "live-server": "^1.2.2"
+    "vite": "^5.0.8",
+    "vitest": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1",
+    "jsdom": "^23.0.1"
   },
   "keywords": ["frontend", "vanilla-js", "cyberpunk", "learning"],
   "author": "Port42 Developer",

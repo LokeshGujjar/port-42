@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Port42 Neural Link</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="port42-popup">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <span class="logo-text">PORT<span class="accent">42</span></span>
+        <span class="subtitle">NEURAL LINK</span>
+      </div>
+      <div class="status-indicator" id="status-indicator">
+        <div class="status-dot"></div>
+      </div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="auth-section" class="section hidden">
+      <div class="auth-form">
+        <h3>AUTHENTICATE NEURAL LINK</h3>
+        <form id="login-form">
+          <div class="input-group">
+            <input type="text" id="username" placeholder="USERNAME" required>
+          </div>
+          <div class="input-group">
+            <input type="password" id="password" placeholder="PASSWORD" required>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-text">CONNECT</span>
+            <div class="btn-loading hidden">⟲</div>
+          </button>
+        </form>
+        <div class="auth-error hidden" id="auth-error"></div>
+        <div class="auth-links">
+          <a href="#" id="register-link">Create Account</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Section -->
+    <div id="user-section" class="section hidden">
+      <div class="user-info">
+        <div class="user-avatar">
+          <span id="user-initial">U</span>
+        </div>
+        <div class="user-details">
+          <div class="username" id="username-display">UNKNOWN_USER</div>
+          <div class="user-level">LEVEL <span id="user-level">1</span></div>
+        </div>
+        <button class="btn-logout" id="logout-btn" title="Disconnect">⏻</button>
+      </div>
+    </div>
+
+    <!-- Quick Submit Section -->
+    <div id="submit-section" class="section hidden">
+      <div class="current-page">
+        <div class="page-info">
+          <div class="page-title" id="page-title">Loading...</div>
+          <div class="page-url" id="page-url">...</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-detect" id="detect-btn" title="Auto-detect content">🔍</button>
+        </div>
+      </div>
+
+      <form id="submit-form">
+        <div class="input-group">
+          <input type="text" id="resource-title" placeholder="RESOURCE TITLE" required>
+        </div>
+        
+        <div class="input-group">
+          <textarea id="resource-description" placeholder="DESCRIPTION (OPTIONAL)" rows="3"></textarea>
+        </div>
+        
+        <div class="input-group">
+          <select id="resource-community" required>
+            <option value="">SELECT COMMUNITY</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <select id="resource-type">
+            <option value="article">ARTICLE</option>
+            <option value="video">VIDEO</option>
+            <option value="course">COURSE</option>
+            <option value="tutorial">TUTORIAL</option>
+            <option value="documentation">DOCUMENTATION</option>
+            <option value="tool">TOOL</option>
+            <option value="other">OTHER</option>
+          </select>
+        </div>
+        
+        <div class="difficulty-selector">
+          <label>DIFFICULTY:</label>
+          <div class="difficulty-buttons">
+            <button type="button" class="difficulty-btn" data-level="beginner">BEGINNER</button>
+            <button type="button" class="difficulty-btn active" data-level="intermediate">INTERMEDIATE</button>
+            <button type="button" class="difficulty-btn" data-level="advanced">ADVANCED</button>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-submit">
+          <span class="btn-text">SUBMIT TO COLLECTIVE</span>
+          <div class="btn-loading hidden">⟲</div>
+        </button>
+      </form>
+      
+      <div class="submit-status hidden" id="submit-status"></div>
+    </div>
+
+    <!-- Loading Section -->
+    <div id="loading-section" class="section">
+      <div class="loading-animation">
+        <div class="matrix-rain"></div>
+        <div class="loading-text">INITIALIZING NEURAL LINK...</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions hidden" id="quick-actions">
+      <button class="quick-btn" id="open-port42">
+        <span class="icon">🌐</span>
+        <span class="text">OPEN PORT42</span>
+      </button>
+      <button class="quick-btn" id="view-submissions">
+        <span class="icon">📊</span>
+        <span class="text">MY SUBMISSIONS</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="version">v1.0.0</div>
+      <div class="credits">NEURAL INTERFACE ACTIVE</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
