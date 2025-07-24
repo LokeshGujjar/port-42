@@ -11,7 +11,10 @@
     "test:coverage": "jest --coverage --detectOpenHandles",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
-    "logs": "tail -f logs/port42.log"
+    "logs": "tail -f logs/port42.log",
+    "seed:communities": "node scripts/seedCommunities.js",
+    "seed:database": "node scripts/seedDatabase.js",
+    "seed": "npm run seed:database"
   },
   "dependencies": {
     "express": "^4.18.2",
